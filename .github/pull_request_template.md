@@ -1,11 +1,21 @@
 # Pull Request
 
+> [!IMPORTANT]
+> **Targeting `main`?**
+> All sections below must be completed.
+> Automated validation will block incomplete PRs.
+>
+> **Targeting another branch?**
+> Only the summary is recommended. All other fields are optional.
+
 ## Summary
-<!-- What changed and why? -->
+<!-- Describe what changed and why. -->
 
 ## Classification
 
 ### Software Risk Level
+<!-- Required for PRs targeting main. Select exactly one. -->
+
 - [ ] L0 - Experimental / Disposable
 - [ ] L1 - Low Risk / Internal Tools
 - [ ] L2 - Production Software
@@ -13,6 +23,8 @@
 - [ ] L4 - Safety-Critical Systems
 
 ### AI Contribution
+<!-- Required for PRs targeting main. Select exactly one. -->
+
 - [ ] AI-0 - No AI involvement
 - [ ] AI-1 - AI-assisted (suggestions, autocomplete)
 - [ ] AI-2 - AI-generated implementation
