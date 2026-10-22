@@ -66,6 +66,6 @@
 ## Author Declaration
 
 - [ ] I understand the code and its intended behavior.
-- [ ] I have reviewed and validated AI-generated changes.
+- [ ] I have reviewed and validated AI-generated changes, if any.
 - [ ] I have disclosed material AI contributions.
 - [ ] This change is ready for review.
