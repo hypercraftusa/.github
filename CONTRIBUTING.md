@@ -1,0 +1,243 @@
+# Hypercraft Engineering Contribution Guidelines
+
+## 1. Purpose
+
+These guidelines establish consistent software development, review, documentation, and verification practices across Hypercraft-managed repositories.
+
+Hypercraft encourages efficient development, experimentation, and the responsible use of AI-assisted engineering tools while maintaining accountability, traceability, security, and software quality.
+
+All contributors are responsible for understanding and following these standards.
+
+## 2. Development Workflow
+
+Hypercraft uses a risk-based development process that distinguishes between development activities and integration into protected branches.
+
+### Development Branches
+
+Development branches support experimentation, prototyping, collaboration, and iterative implementation.
+
+Pull requests targeting branches other than `main` are not required to complete the organization-wide PR template unless additional repository-specific requirements apply.
+
+Contributors are encouraged to document significant technical decisions, AI involvement, and testing throughout development.
+
+### Main Branch
+
+All changes targeting `main` must:
+
+- Be submitted through a pull request.
+- Complete the required PR documentation.
+- Identify software risk and AI contribution classifications.
+- Pass applicable automated checks.
+- Receive required human review and approval.
+- Include appropriate verification evidence.
+- Satisfy applicable security, documentation, and engineering requirements.
+
+Direct changes to protected branches are prohibited unless specifically authorized through an approved exception.
+
+Merging into `main` does not independently authorize production deployment or release.
+
+## 3. Software Risk Classification
+
+Every pull request targeting `main` must identify its software risk level.
+
+| Level | Classification | Description |
+|---|---|---|
+| L0 | Experimental | Disposable prototypes, experiments, and exploratory code |
+| L1 | Low Risk | Internal utilities, scripts, and noncritical development tools |
+| L2 | Production | Production applications, services, libraries, and infrastructure |
+| L3 | Critical | Software affecting critical operational functions, security, or system availability |
+| L4 | Safety Critical | Software implementing or affecting safety-related functions |
+
+Classification is based on the potential consequences of software failure, not the method used to develop the software.
+
+When multiple classifications apply, the highest applicable level governs.
+
+Experimental code must be reclassified before integration into production systems.
+
+### Review Expectations
+
+| Requirement | L0 | L1 | L2 | L3 | L4 |
+|---|---|---|---|---|---|
+| Human ownership | Required | Required | Required | Required | Required |
+| PR documentation | Basic | Basic | Standard | Detailed | Detailed |
+| Independent code review | Per branch policy | Per branch policy | Required | Required | Required |
+| Automated verification | As applicable | As applicable | Required | Required | Required |
+| Design documentation | Optional | As applicable | As applicable | Required | Required |
+| Requirements traceability | Optional | Optional | As applicable | Required | Required |
+| Formal engineering approval | No | No | As applicable | Required | Required |
+| Safety verification | No | No | If applicable | If applicable | Required |
+
+Organization-wide branch protection may impose a minimum independent review requirement on all changes targeting `main`, regardless of classification.
+
+Additional requirements may apply to specific systems, components, or repositories.
+
+## 4. AI-Assisted Development
+
+Hypercraft encourages the responsible use of AI tools for software development, debugging, testing, documentation, and engineering analysis.
+
+AI-generated code is subject to the same quality, security, and verification requirements as human-authored code.
+
+Use of AI does not transfer responsibility for the implementation away from the contributing engineer.
+
+### AI Contribution Classification
+
+Every pull request targeting `main` must identify the level of AI involvement.
+
+| Level | Classification | Description |
+|---|---|---|
+| AI-0 | Human Authored | No substantive AI involvement |
+| AI-1 | AI Assisted | Autocomplete, suggestions, explanations, or minor refactoring |
+| AI-2 | AI Generated | AI generated meaningful implementation logic, functions, classes, or tests |
+| AI-3 | Agentic Development | AI autonomously created or modified substantial code using development tools |
+| AI-4 | Unverified | AI-generated implementation that has not been adequately understood or validated |
+
+AI-4 is a temporary classification and is not permitted in controlled production branches.
+
+AI-3 does not automatically indicate greater risk than AI-2. Software criticality and AI contribution are evaluated independently.
+
+### AI Provenance
+
+For AI-2 and AI-3 contributions, pull requests must identify:
+
+- AI tools used.
+- Significant code or functionality generated by AI.
+- Human-authored modifications and engineering decisions.
+- Verification performed by the responsible engineer.
+
+Routine AI assistance classified as AI-1 does not require line-by-line provenance.
+
+Significant AI-generated algorithms or critical implementations may require additional source-level annotations or linked design records.
+
+### Human Accountability
+
+Contributors must understand the code they submit.
+
+An engineer must be able to explain the implementation's intended behavior, interfaces, assumptions, and relevant failure modes.
+
+AI-generated code must not be merged solely because it compiles, passes AI-generated tests, or receives a favorable AI-generated review.
+
+AI-assisted code review may supplement but does not replace required human review.
+
+## 5. Code Review
+
+Code reviews are intended to verify correctness, maintainability, security, and compliance with applicable engineering requirements.
+
+Reviewers should evaluate:
+
+- Implementation correctness and clarity.
+- Compliance with intended requirements.
+- Error handling and failure behavior.
+- Security implications.
+- Interfaces and dependencies.
+- Test quality and coverage.
+- Documentation accuracy.
+- Unnecessary complexity or generated code that is not understood.
+
+Reviewers must not approve changes they cannot adequately evaluate.
+
+The author of a change may not serve as its sole independent reviewer.
+
+For L3 and L4 changes, reviewers must possess appropriate technical expertise for the affected system.
+
+## 6. Testing and Verification
+
+All changes targeting `main` must undergo verification appropriate to their software risk classification.
+
+Verification may include:
+
+- Build and compilation checks.
+- Static analysis and linting.
+- Unit and integration tests.
+- Hardware or software simulation.
+- Fault injection and failure-mode testing.
+- System-level verification.
+- Requirements-based testing.
+
+Passing automated tests does not independently establish correctness or safety.
+
+For critical software, verification must demonstrate that the implementation satisfies its intended requirements and relevant failure-handling expectations.
+
+Verification evidence must be documented or linked in the associated pull request.
+
+## 7. Documentation
+
+Documentation requirements are proportional to the complexity and criticality of the change.
+
+Contributors must document significant changes to:
+
+- System architecture.
+- Public interfaces and APIs.
+- Data structures and protocols.
+- Configuration and deployment behavior.
+- Dependencies.
+- Operational assumptions.
+- Error handling and failure modes.
+
+For L3 and L4 software, documentation must support applicable requirements traceability, design review, and verification processes.
+
+AI-generated documentation must be reviewed for technical accuracy.
+
+## 8. Security and Dependencies
+
+Contributors must follow applicable company cybersecurity and information-handling requirements.
+
+Software changes must not:
+
+- Introduce hardcoded credentials or secrets.
+- Expose confidential or restricted information.
+- Introduce unauthorized external dependencies.
+- Bypass established security controls.
+- Grant AI tools unauthorized access to company systems.
+
+New dependencies must be evaluated for security, maintenance, licensing, and compatibility with the intended deployment environment.
+
+AI tools must only process company information within their approved authorization boundaries.
+
+## 9. Pull Request Requirements
+
+Hypercraft maintains an organization-wide pull request template.
+
+### PRs Targeting `main`
+
+The following are mandatory:
+
+1. Change summary.
+2. Software risk classification.
+3. AI contribution classification.
+4. AI provenance when applicable.
+5. Verification information.
+6. Documentation and requirements references when applicable.
+7. Author declarations.
+8. Required approvals and automated checks.
+
+Incomplete or noncompliant pull requests may be blocked from merging.
+
+### PRs Targeting Other Branches
+
+Completion of the organization-wide template is optional unless otherwise required.
+
+Contributors remain responsible for complying with applicable security and information-protection requirements regardless of branch.
+
+Repository-specific requirements may impose additional controls but may not weaken mandatory organization-wide standards.
+
+## 10. Engineering Authority and Exceptions
+
+Engineering leadership maintains authority over company-wide software development standards and technical approval requirements.
+
+Contributors and repository maintainers may not independently waive mandatory engineering requirements.
+
+Exceptions must be documented and approved by authorized Engineering leadership.
+
+Additional requirements may apply to critical systems, customer-specific programs, or regulated development activities.
+
+## 11. Continuous Improvement
+
+Hypercraft recognizes that software development tools, AI capabilities, and engineering practices evolve.
+
+These guidelines will be reviewed periodically and updated as necessary to maintain an effective balance between development velocity, engineering rigor, and operational reliability.
+
+Contributors are encouraged to identify opportunities to improve development processes without compromising technical accountability.
+
+---
+
+**Hypercraft Engineering | Organization-Wide Contribution Standard**
