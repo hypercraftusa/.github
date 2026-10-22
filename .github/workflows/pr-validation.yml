@@ -1,0 +1,140 @@
+name: Hypercraft PR Validation
+
+on:
+  workflow_call:
+
+jobs:
+  validate:
+    name: Validate PR
+    runs-on: ubuntu-latest
+
+    permissions:
+      pull-requests: read
+
+    steps:
+      - name: Validate PR requirements
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+
+            if (!pr) {
+              core.setFailed("This workflow requires a pull request.");
+              return;
+            }
+
+            // Only enforce on PRs targeting main.
+            if (pr.base.ref !== "main") {
+              core.info("Development PR. Validation not required.");
+              return;
+            }
+
+            const body = pr.body || "";
+            const errors = [];
+
+            const riskLevels = ["L0", "L1", "L2", "L3", "L4"];
+            const aiLevels = ["AI-0", "AI-1", "AI-2", "AI-3", "AI-4"];
+
+            function selectedLevels(levels) {
+              return levels.filter(level => {
+                const pattern = new RegExp(
+                  `^- \\[x\\] ${level}(?=\\s|\\b)`, "gim"
+                );
+                return pattern.test(body);
+              });
+            }
+
+            function section(name) {
+              const escaped = name.replace(
+                /[.*+?^${}()|[\]\\]/g, "\\$&"
+              );
+
+              const match = body.match(new RegExp(
+                `^## ${escaped}\\s*$([\\s\\S]*?)(?=^## |$(?![\\s\\S]))`,
+                "mi"
+              ));
+
+              return match ? match[1].trim() : "";
+            }
+
+            function field(name) {
+              const escaped = name.replace(
+                /[.*+?^${}()|[\]\\]/g, "\\$&"
+              );
+
+              const match = body.match(new RegExp(
+                `^\\*\\*${escaped}:\\*\\*\\s*(.*)$`, "mi"
+              ));
+
+              if (!match) return "";
+
+              const inline = match[1].trim();
+              if (inline) return inline;
+
+              const after = body.slice(match.index + match[0].length);
+              const next = after.match(
+                /^\s*(?:<!--[\s\S]*?-->\s*)*([^\r\n]+)/ 
+              );
+
+              return next ? next[1].trim() : "";
+            }
+
+            function meaningful(value) {
+              return value.length > 0 &&
+                !/^(n\/a|none|tbd|todo)$/i.test(value);
+            }
+
+            const risk = selectedLevels(riskLevels);
+            const ai = selectedLevels(aiLevels);
+
+            if (risk.length !== 1) {
+              errors.push("Select exactly one software risk level.");
+            }
+
+            if (ai.length !== 1) {
+              errors.push("Select exactly one AI contribution level.");
+            }
+
+            if (ai.includes("AI-4")) {
+              errors.push("AI-4 changes cannot merge into main.");
+            }
+
+            if (!meaningful(section("Summary"))) {
+              errors.push("A change summary is required.");
+            }
+
+            if (ai.includes("AI-2") || ai.includes("AI-3")) {
+              for (const name of [
+                "Tools Used",
+                "AI-Generated Work",
+                "Human-Authored / Validated Work"
+              ]) {
+                if (!meaningful(field(name))) {
+                  errors.push(`${name} is required for ${ai[0]}.`);
+                }
+              }
+            }
+
+            if (!/^- \[x\] Changes reviewed by author$/mi.test(body)) {
+              errors.push("Author review must be confirmed.");
+            }
+
+            const declaration = [
+              "I understand the code and its intended behavior.",
+              "I have reviewed and validated AI-generated changes, if any.",
+              "I have disclosed material AI contributions.",
+              "This change is ready for review."
+            ];
+
+            for (const item of declaration) {
+              if (!body.includes(`- [x] ${item}`) &&
+                  !body.includes(`- [X] ${item}`)) {
+                errors.push(`Missing author declaration: ${item}`);
+              }
+            }
+
+            if (errors.length) {
+              core.setFailed(errors.join("\n"));
+            } else {
+              core.info("Hypercraft PR validation passed.");
+            }
