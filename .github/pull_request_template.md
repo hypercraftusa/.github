@@ -21,6 +21,8 @@
 - [ ] **Breaking Changes**
 <!-- If checked, describe affected interfaces, compatibility impacts, and any required migration or deployment steps. -->
 
+**Breaking Change Details:**
+
 ## Risk Classification
 <!-- Select exactly one for PRs targeting main. See CONTRIBUTING.md for definitions.-->
 
@@ -33,7 +35,7 @@
 ## Verification
 
 ### Verification Performed
-<!-- Describe how the changes were verified. Include test results, CI checks, simulations, or other evidence as applicable.-->
+<!-- Describe tests, CI checks, simulations, or other verification. If not applicable, explain why. -->
 
 ### Known Limitations
 <!-- Identify any testing limitations or outstanding concerns.-->
