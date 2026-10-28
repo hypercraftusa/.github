@@ -18,6 +18,9 @@
 ## Implementation
 <!-- Describe significant implementation details, design decisions, or tradeoffs. Enter N/A for straightforward changes.-->
 
+- [ ] **Breaking Changes**
+<!-- If checked, describe affected interfaces, compatibility impacts, and any required migration or deployment steps. -->
+
 ## Risk Classification
 <!-- Select exactly one for PRs targeting main. See CONTRIBUTING.md for definitions.-->
 
