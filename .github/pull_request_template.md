@@ -6,15 +6,20 @@
 > Automated validation will block incomplete PRs.
 >
 > **Targeting another branch?**
-> Only the summary is recommended. All other fields are optional.
+> Only the summary is required. All other fields are optional unless otherwise required by the repository.
 
 ## Summary
-<!-- Describe what changed and why. -->
+<!-- Describe what changed and why. Keep this concise. -->
 
-## Classification
+## Work Item
+<!-- Link to the associated work item, feature, requirement, or issue. -->
+<!-- For minor administrative changes without a work item, explain why. -->
 
-### Software Risk Level
-<!-- Required for PRs targeting main. Select exactly one. -->
+## Implementation
+<!-- Describe significant implementation details, design decisions, or tradeoffs. Enter N/A for straightforward changes.-->
+
+## Risk Classification
+<!-- Select exactly one for PRs targeting main. See CONTRIBUTING.md for definitions.-->
 
 - [ ] L0 - Experimental / Disposable
 - [ ] L1 - Low Risk / Internal Tools
@@ -22,48 +27,23 @@
 - [ ] L3 - Critical Systems
 - [ ] L4 - Safety-Critical Systems
 
-### AI Contribution
-<!-- Required for PRs targeting main. Select exactly one. -->
-
-- [ ] AI-0 - No AI involvement
-- [ ] AI-1 - AI-assisted (suggestions, autocomplete)
-- [ ] AI-2 - AI-generated implementation
-- [ ] AI-3 - Agentic development
-- [ ] AI-4 - Unverified AI output (NOT MERGEABLE)
-
-## AI Provenance
-<!-- Required for AI-2 and AI-3. Otherwise enter N/A. -->
-
-**Tools Used:**
-<!-- e.g. Claude Code, Copilot, ChatGPT -->
-
-**AI-Generated Work:**
-<!-- What did AI generate or modify? -->
-
-**Human-Authored / Validated Work:**
-<!-- What did the engineer implement, review, or verify? -->
-
 ## Verification
 
-- [ ] Changes reviewed by author
-- [ ] Builds successfully
-- [ ] Tests added or updated
-- [ ] Relevant tests passed
-- [ ] Security implications considered
+### Verification Performed
+<!-- Describe how the changes were verified. Include test results, CI checks, simulations, or other evidence as applicable.-->
 
-**Verification Evidence:**
-<!-- CI results, test reports, or N/A with explanation -->
+### Known Limitations
+<!-- Identify any testing limitations or outstanding concerns.-->
 
-## Documentation
-<!-- Required for L2-L4 as applicable. -->
+## AI Contribution
+<!--Complete only if AI materially generated or modified implementation code. Routine autocomplete, explanations, and minor suggestions do not require disclosure.-->
+- [ ] **Material AI Contribution**
 
-**Design / Interface Changes:**
-<!-- Describe or link documentation. Enter N/A if none. -->
-
-**Requirements / Issues:**
-<!-- Link related requirements, tickets, or issues. -->
+### Details (if Yes)
+<!-- Briefly describe what AI generated or modified and how the resulting implementation was reviewed and validated.-->
 
 ## Author Declaration
+<!-- Required for PRs targeting main.-->
 
 - [ ] I understand the code and its intended behavior.
 - [ ] I have reviewed and validated AI-generated changes, if any.
