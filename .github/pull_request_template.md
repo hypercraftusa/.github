@@ -44,7 +44,7 @@
 <!--Complete only if AI materially generated or modified implementation code. Routine autocomplete, explanations, and minor suggestions do not require disclosure.-->
 - [ ] **Material AI Contribution**
 
-### Details (if Yes)
+**AI Contribution Details:**
 <!-- Briefly describe what AI generated or modified and how the resulting implementation was reviewed and validated.-->
 
 ## Author Declaration
