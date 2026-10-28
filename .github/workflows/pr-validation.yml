@@ -17,124 +17,75 @@ jobs:
         with:
           script: |
             const pr = context.payload.pull_request;
-
             if (!pr) {
-              core.setFailed("This workflow requires a pull request.");
+              core.setFailed('This workflow requires a pull request event.');
+              return;
+            }
+            if (pr.base.ref !== 'main') {
+              core.info('Development PR: validation not required.');
               return;
             }
 
-            // Only enforce on PRs targeting main.
-            if (pr.base.ref !== "main") {
-              core.info("Development PR. Validation not required.");
-              return;
-            }
-
-            const body = pr.body || "";
+            const body = (pr.body || '').replace(/<!--[^]*?-->/g, '');
             const errors = [];
-
-            const riskLevels = ["L0", "L1", "L2", "L3", "L4"];
-            const aiLevels = ["AI-0", "AI-1", "AI-2", "AI-3", "AI-4"];
-
-            function selectedLevels(levels) {
-              return levels.filter(level => {
-                const pattern = new RegExp(
-                  `^- \\[x\\] ${level}(?=\\s|\\b)`, "gim"
-                );
-                return pattern.test(body);
-              });
-            }
+            const escapeRegExp = value => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const checked = label => new RegExp(`^\\s*- \\[x\\] \\*\\*${escapeRegExp(label)}\\*\\*\\s*$`, 'im').test(body);
+            const declared = label => new RegExp(`^\\s*- \\[x\\] ${escapeRegExp(label)}\\s*$`, 'im').test(body);
 
             function section(name) {
-              const escaped = name.replace(
-                /[.*+?^${}()|[\]\\]/g, "\\$&"
-              );
+              const lines = body.split(/\r?\n/);
+              const heading = `## ${name}`;
+              const start = lines.findIndex(line => line.trim() === heading);
+              if (start < 0) return null;
+              const end = lines.findIndex((line, index) => index > start && /^##\s+/.test(line));
+              return lines.slice(start + 1, end < 0 ? undefined : end).join('\n').trim();
+            }
+            function subsection(name, parent) {
+              const content = section(parent);
+              if (content === null) return null;
+              const lines = content.split(/\r?\n/);
+              const start = lines.findIndex(line => line.trim() === `### ${name}`);
+              if (start < 0) return null;
+              const end = lines.findIndex((line, index) => index > start && /^###\s+/.test(line));
+              return lines.slice(start + 1, end < 0 ? undefined : end).join('\n').trim();
+            }
+            const hasContent = value => value !== null && value.trim().length > 0;
+            const substantive = value => hasContent(value) && !/^(n\/?a|none|tbd|todo|pending)$/i.test(value.trim());
 
-              const match = body.match(new RegExp(
-                `^## ${escaped}\\s*$([\\s\\S]*?)(?=^## |$(?![\\s\\S]))`,
-                "mi"
-              ));
+            if (!substantive(section('Summary'))) errors.push('Provide a meaningful Summary.');
+            if (!substantive(section('Work Item'))) errors.push('Provide a work item reference or an explanation for a minor administrative exception.');
 
-              return match ? match[1].trim() : "";
+            const risk = ['L0', 'L1', 'L2', 'L3', 'L4'].filter(level =>
+              new RegExp(`^\\s*- \\[x\\] ${level}\\s+-`, 'im').test(body)
+            );
+            if (risk.length !== 1) errors.push('Select exactly one L0–L4 risk classification.');
+
+            if (section('Implementation') === null) errors.push('Include the Implementation section (N/A is acceptable).');
+            if (checked('Breaking Changes') && !substantive(section('Implementation')?.replace(/^\s*- \[[ xX]\] \*\*Breaking Changes\*\*/m, '').replace(/^\s*\*\*Breaking Change Details:\*\*/m, '').trim())) {
+              errors.push('Describe compatibility impacts and migration steps for breaking changes.');
             }
 
-            function field(name) {
-              const escaped = name.replace(
-                /[.*+?^${}()|[\]\\]/g, "\\$&"
-              );
-
-              const match = body.match(new RegExp(
-                `^\\*\\*${escaped}:\\*\\*\\s*(.*)$`, "mi"
-              ));
-
-              if (!match) return "";
-
-              const inline = match[1].trim();
-              if (inline) return inline;
-
-              const after = body.slice(match.index + match[0].length);
-              const next = after.match(
-                /^\s*(?:<!--[\s\S]*?-->\s*)*([^\r\n]+)/ 
-              );
-
-              return next ? next[1].trim() : "";
+            const verification = subsection('Verification Performed', 'Verification');
+            if (!substantive(verification) && !(hasContent(verification) && /^n\/?a\s*[-:,(]/i.test(verification))) {
+              errors.push('Describe verification performed, or explain why it is not applicable.');
+            }
+            if (!hasContent(subsection('Known Limitations', 'Verification'))) {
+              errors.push('Address Known Limitations (None is acceptable).');
             }
 
-            function meaningful(value) {
-              return value.length > 0 &&
-                !/^(n\/a|none|tbd|todo)$/i.test(value);
+            if (checked('Material AI Contribution') && !substantive(subsection('Details (if Yes)', 'AI Contribution'))) {
+              errors.push('Describe material AI contributions and human validation.');
             }
 
-            const risk = selectedLevels(riskLevels);
-            const ai = selectedLevels(aiLevels);
-
-            if (risk.length !== 1) {
-              errors.push("Select exactly one software risk level.");
+            for (const item of [
+              'I understand the code and its intended behavior.',
+              'I have reviewed and validated AI-generated changes, if any.',
+              'I have disclosed material AI contributions.',
+              'This change is ready for review.'
+            ]) {
+              if (!declared(item)) errors.push(`Missing author declaration: ${item}`);
             }
 
-            if (ai.length !== 1) {
-              errors.push("Select exactly one AI contribution level.");
-            }
+            if (errors.length) core.setFailed(errors.join('\n'));
+            else core.info('Hypercraft PR validation passed.');
 
-            if (ai.includes("AI-4")) {
-              errors.push("AI-4 changes cannot merge into main.");
-            }
-
-            if (!meaningful(section("Summary"))) {
-              errors.push("A change summary is required.");
-            }
-
-            if (ai.includes("AI-2") || ai.includes("AI-3")) {
-              for (const name of [
-                "Tools Used",
-                "AI-Generated Work",
-                "Human-Authored / Validated Work"
-              ]) {
-                if (!meaningful(field(name))) {
-                  errors.push(`${name} is required for ${ai[0]}.`);
-                }
-              }
-            }
-
-            if (!/^- \[x\] Changes reviewed by author$/mi.test(body)) {
-              errors.push("Author review must be confirmed.");
-            }
-
-            const declaration = [
-              "I understand the code and its intended behavior.",
-              "I have reviewed and validated AI-generated changes, if any.",
-              "I have disclosed material AI contributions.",
-              "This change is ready for review."
-            ];
-
-            for (const item of declaration) {
-              if (!body.includes(`- [x] ${item}`) &&
-                  !body.includes(`- [X] ${item}`)) {
-                errors.push(`Missing author declaration: ${item}`);
-              }
-            }
-
-            if (errors.length) {
-              core.setFailed(errors.join("\n"));
-            } else {
-              core.info("Hypercraft PR validation passed.");
-            }
