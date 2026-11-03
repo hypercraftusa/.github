@@ -49,6 +49,15 @@ jobs:
               const end = lines.findIndex((line, index) => index > start && /^###\s+/.test(line));
               return lines.slice(start + 1, end < 0 ? undefined : end).join('\n').trim();
             }
+            // Text after a bold "**Label:**" line within a section, up to the end of that section.
+            function labeled(label, parent) {
+              const content = section(parent);
+              if (content === null) return null;
+              const marker = `**${label}:**`;
+              const start = content.indexOf(marker);
+              if (start < 0) return null;
+              return content.slice(start + marker.length).trim();
+            }
             const hasContent = value => value !== null && value.trim().length > 0;
             const substantive = value => hasContent(value) && !/^(n\/?a|none|tbd|todo|pending)$/i.test(value.trim());
 
@@ -61,7 +70,7 @@ jobs:
             if (risk.length !== 1) errors.push('Select exactly one L0–L3 risk classification.');
 
             if (section('Implementation') === null) errors.push('Include the Implementation section (N/A is acceptable).');
-            if (checked('Breaking Changes') && !substantive(section('Implementation')?.replace(/^\s*- \[[ xX]\] \*\*Breaking Changes\*\*/m, '').replace(/^\s*\*\*Breaking Change Details:\*\*/m, '').trim())) {
+            if (checked('Breaking Changes') && !substantive(labeled('Breaking Change Details', 'Implementation'))) {
               errors.push('Describe compatibility impacts and migration steps for breaking changes.');
             }
 
@@ -73,7 +82,7 @@ jobs:
               errors.push('Address Known Limitations (None is acceptable).');
             }
 
-            if (checked('Material AI Contribution') && !substantive(subsection('Details (if Yes)', 'AI Contribution'))) {
+            if (checked('Material AI Contribution') && !substantive(labeled('AI Contribution Details', 'AI Contribution'))) {
               errors.push('Describe material AI contributions and human validation.');
             }
 
