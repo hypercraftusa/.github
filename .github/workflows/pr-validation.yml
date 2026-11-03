@@ -55,10 +55,10 @@ jobs:
             if (!substantive(section('Summary'))) errors.push('Provide a meaningful Summary.');
             if (!substantive(section('Work Item'))) errors.push('Provide a work item reference or an explanation for a minor administrative exception.');
 
-            const risk = ['L0', 'L1', 'L2', 'L3', 'L4'].filter(level =>
+            const risk = ['L0', 'L1', 'L2', 'L3'].filter(level =>
               new RegExp(`^\\s*- \\[x\\] ${level}\\s+-`, 'im').test(body)
             );
-            if (risk.length !== 1) errors.push('Select exactly one L0–L4 risk classification.');
+            if (risk.length !== 1) errors.push('Select exactly one L0–L3 risk classification.');
 
             if (section('Implementation') === null) errors.push('Include the Implementation section (N/A is acceptable).');
             if (checked('Breaking Changes') && !substantive(section('Implementation')?.replace(/^\s*- \[[ xX]\] \*\*Breaking Changes\*\*/m, '').replace(/^\s*\*\*Breaking Change Details:\*\*/m, '').trim())) {
