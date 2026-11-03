@@ -28,9 +28,8 @@
 
 - [ ] L0 - Experimental / Disposable
 - [ ] L1 - Low Risk / Internal Tools
-- [ ] L2 - Production Software
-- [ ] L3 - Critical Systems
-- [ ] L4 - Safety-Critical Systems
+- [ ] L2 - Production Software / Customer Facing
+- [ ] L3 - Critical / Controlled Systems 
 
 ## Verification
 
